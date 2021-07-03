@@ -6,17 +6,22 @@ import { Link, useHistory } from "react-router-dom";
 import { Btn, InputField } from "../../components";
 import { useState } from "react";
 import usePasswordValidator from "react-use-password-validator";
+import Modal from '@material-ui/core/Modal';
+import Fade from '@material-ui/core/Fade';
+import Backdrop from '@material-ui/core/Backdrop';
+import { CircularProgress } from '@material-ui/core';
+
 // import { useDispatch } from "react-redux";
 // import { authActions, modalAction } from "../../store/actions";
 // import PasswordStrengthBar from "react-password-strength-bar";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "100%",
+    marginTop: "40px",
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
-    padding: "20px 0px",
+    // padding: "20px 20px",
     height: "auto",
   },
   card: {
@@ -46,6 +51,11 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: "0px",
     marginBottom: "0PX",
   },
+  modal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 }));
 
 export const Signup = () => {
@@ -57,8 +67,8 @@ export const Signup = () => {
   const [password, setPassword] = useState("");
   const [phonenum, setphonenum] = useState();
   const [load, setLoad] = useState(false);
-  const [score, setScore] = useState(false);
   const [removeArray, setRemoveArray] = useState(false);
+  const [open, setOpen] = React.useState(false);
   const [validate, setValidate] = useState({
     firstNameError: "",
     lastNameError: "",
@@ -175,7 +185,6 @@ export const Signup = () => {
       }));
     }
     if (!isValid) {
-      // validatePassword()
       if (removeArray === true) {
         setValidate((oldState) => ({
           ...oldState,
@@ -204,12 +213,9 @@ export const Signup = () => {
     // has uppercase letter
     if (password.toLowerCase() !== password) {
       setContainsUL(true);
-      // console.log('An uppercase letter (a-z)')
     } else {
       setContainsUL(false);
       tempErrors.push(mustContainData[1]);
-      // setErrorArray(mustContainData[1]);
-      // setErrorArray(tempErrors);
     }
 
     // has lowercase letter
@@ -220,8 +226,7 @@ export const Signup = () => {
       console.log("has lowercase letter");
       setContainsLL(false);
       tempErrors.push(mustContainData[0]);
-      // setErrorArray(mustContainData[0]);
-      // setErrorArray(tempErrors);
+
     }
 
     // has number
@@ -230,20 +235,8 @@ export const Signup = () => {
       console.log("has no number");
       setContainsN(false);
       tempErrors.push(mustContainData[2]);
-      // setErrorArray(mustContainData[2]);
-      // setErrorArray(tempErrors);
+    
     }
-
-    // has special character
-    // if (/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(password))
-    //   setContainsSC(true);
-    // else {
-    //   console.log("has no special number");
-    //   setContainsSC(false);
-    //   setPassError("use symbols");
-    //   tempErrors.push(mustContainData[3]);
-    //   // setErrorArray(mustContainData[3]);
-    // }
 
     // has 8 characters
     if (password.length >= 8) setContains8C(true);
@@ -251,13 +244,8 @@ export const Signup = () => {
       console.log("has no 8 characters");
       setContains8C(false);
       tempErrors.push(mustContainData[4]);
-      // setErrorArray(mustContainData[4]);
-      // setErrorArray(tempErrors);
+     
     }
-
-    // passwords match
-    // if (password !== "" && passwordOne === passwordTwo) setPasswordMatch(true)
-    // else setPasswordMatch(false)
 
     // all validations passed
     console.log("Valid hogaya", containsLL, containsUL, containsN, contains8C);
@@ -265,21 +253,26 @@ export const Signup = () => {
       setErrorArray(tempErrors);
       // setAllValid(true);
     }
-    // else {
-    //   setErrorArray(tempErrors);
-    //   setAllValid(false);
-    // }
-    // setTimeout(() => {
-    //   setErrorArray([]);
-    // }, 100);
+    else{
+      handleOpen()
+      setTimeout(() => {
+        history.push("/Confirmation");
+      }, 2000);
+      console.log('hello')
+    }
+  };
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
   return (
     <div>
       <div className={classes.root}>
-        <Grid container className={classes.root}>
-          <Grid item lg={8} md={8} sm={10} xs={10}>
-            <br />
-            <br />
+        <Grid container justify="center" alignItems="center" className={classes.root} >
+          <Grid item lg={8} md={10} sm={10} xs={10}>
             <div className={classes.card}>
               <h1 className={classes.title}></h1>
               <div>
@@ -370,7 +363,7 @@ export const Signup = () => {
                       label="Password"
                       // onKeyUp={validatePassword}
                       onBlur={validatePassword}
-                      // onFocus={validatePassword}
+                    // onFocus={validatePassword}
                     />
                     {/* <div className="must-container cfb">
                       {mustContainData.map(data => <MustContainItem data={data} />)}
@@ -392,6 +385,26 @@ export const Signup = () => {
                 </span>
               </div>
             </div>
+            <Modal
+              aria-labelledby="transition-modal-title"
+              aria-describedby="transition-modal-description"
+              className={classes.modal}
+              open={open}
+              // onClose={handleClose}
+              closeAfterTransition
+              BackdropComponent={Backdrop}
+              BackdropProps={{
+                timeout: 500,
+              }}
+            >
+              <Fade in={open}>
+                <div className={classes.paper}>
+                  <CircularProgress style={{
+                    color:"#00EFD4"
+                  }} />
+                </div>
+              </Fade>
+            </Modal>
           </Grid>
         </Grid>
       </div>
