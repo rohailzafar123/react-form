@@ -5,6 +5,11 @@ import { Link, useHistory } from "react-router-dom";
 // import backIcon from "../../asstes/Images/back.svg";
 import { Btn, InputField } from "../../components";
 import { useState } from "react";
+import usePasswordValidator from "react-use-password-validator";
+import Modal from '@material-ui/core/Modal';
+import Fade from '@material-ui/core/Fade';
+import Backdrop from '@material-ui/core/Backdrop';
+import { CircularProgress } from '@material-ui/core';
 
 // import { useDispatch } from "react-redux";
 // import { authActions, modalAction } from "../../store/actions";
@@ -12,11 +17,11 @@ import { useState } from "react";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "100%",
+    marginTop: "40px",
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
-    padding: "20px 0px",
+    // padding: "20px 20px",
     height: "auto",
   },
   card: {
@@ -32,10 +37,10 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
   },
   classOne: {
-    textTransform: 'lowercase',
-    '& > :first-letter': {
-      textTransform: 'capitalize'
-    }
+    textTransform: "lowercase",
+    "& > :first-letter": {
+      textTransform: "capitalize",
+    },
   },
   title: {
     color: "#3D3D3D",
@@ -45,6 +50,11 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "30px",
     paddingBottom: "0px",
     marginBottom: "0PX",
+  },
+  modal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 }));
 
@@ -57,35 +67,51 @@ export const Signup = () => {
   const [password, setPassword] = useState("");
   const [phonenum, setphonenum] = useState();
   const [load, setLoad] = useState(false);
-  const [score, setScore] = useState(false);
+  const [removeArray, setRemoveArray] = useState(false);
+  const [open, setOpen] = React.useState(false);
   const [validate, setValidate] = useState({
     firstNameError: "",
     lastNameError: "",
     emailError: "",
     passwordError: "",
     phoneNumError: "",
-
   });
   // booleans for password validations
-  const [containsUL, setContainsUL] = useState(false) // uppercase letter
-  const [containsLL, setContainsLL] = useState(false) // lowercase letter
-  const [containsN, setContainsN] = useState(false) // number
-  const [containsSC, setContainsSC] = useState(false) // special character
-  const [contains8C, setContains8C] = useState(false) // min 8 characters
-  const [passwordMatch, setPasswordMatch] = useState(false) // passwords match
-
+  const [containsUL, setContainsUL] = useState(false); // uppercase letter
+  const [containsLL, setContainsLL] = useState(false); // lowercase letter
+  const [containsN, setContainsN] = useState(false); // number
+  const [containsSC, setContainsSC] = useState(false); // special character
+  const [contains8C, setContains8C] = useState(false); // min 8 characters
+  const [passwordMatch, setPasswordMatch] = useState(false); // passwords match
+  const [isValid, setIsValid] = usePasswordValidator({
+    digits: 1,
+    min: 8,
+    lowercase: true,
+    uppercase: 1,
+    spaces: false,
+  });
+  const [errorArray, setErrorArray] = useState([]); // passwords match
   // checks all validations are true
-  const [allValid, setAllValid] = useState(false)
 
   // labels and state boolean corresponding to each validation
+  const mustContainData0 = [
+    ["an uppercase letter (a-z)", containsUL],
+    ["a lowercase letter (A-Z)", containsLL],
+    ["a number (0-9)", containsN],
+    ["a special character (!@#$)", containsSC],
+    ["at least 8 characters", contains8C],
+    ["Passwords match", passwordMatch],
+  ];
+
   const mustContainData = [
-    ["An uppercase letter (a-z)", containsUL],
-    ["A lowercase letter (A-Z)", containsLL],
-    ["A number (0-9)", containsN],
-    ["A special character (!@#$)", containsSC],
-    ["At least 8 characters", contains8C],
-    ["Passwords match", passwordMatch]
-  ]
+    ["an lowercase letter (a-z)"],
+    ["a uppercase letter (A-Z)"],
+    ["a number (0-9)"],
+    ["a special character (!@#$)"],
+    ["at least 8 characters"],
+    ["Passwords match"],
+  ];
+
   const history = useHistory();
 
   function validateEmail(email) {
@@ -94,7 +120,19 @@ export const Signup = () => {
     return specialChracter.test(email);
   }
 
+  const ontypePassword = (e) => {
+    setPassword(e.target.value);
+    setIsValid(e.target.value);
+    // validatePassword();
+  };
+
   const handleSignUp = (e) => {
+    // validatePassword();
+    if (removeArray === true) {
+      setRemoveArray(false);
+      console.log("Remove karo");
+      setErrorArray([]);
+    }
     e.preventDefault();
     if (!firstName) {
       setValidate((oldState) => ({
@@ -146,14 +184,17 @@ export const Signup = () => {
         phoneNumError: "",
       }));
     }
-    if (score < 2) {
-      setValidate((oldState) => ({
-        ...oldState,
-        passwordError: "Password is too weak",
-      }));
+    if (!isValid) {
+      if (removeArray === true) {
+        setValidate((oldState) => ({
+          ...oldState,
+          passwordError: "Password must contain " + errorArray,
+        }));
+      }
       return;
     } else {
-      validatePassword()
+      console.log("password chala");
+      validatePassword();
       setValidate((oldState) => ({
         ...oldState,
         passwordError: "",
@@ -163,50 +204,75 @@ export const Signup = () => {
   };
   // console.log(phonenum,'phone num')
 
-
   const validatePassword = () => {
+    setRemoveArray(true);
+    console.log("errorArray", errorArray);
+    let tempErrors = errorArray.slice();
+    console.log("tempErrors", tempErrors);
+
     // has uppercase letter
-    if (password.toLowerCase() != password){
-      setContainsUL(true)
-      // console.log('An uppercase letter (a-z)')
+    if (password.toLowerCase() !== password) {
+      setContainsUL(true);
+    } else {
+      setContainsUL(false);
+      tempErrors.push(mustContainData[1]);
     }
-    else setContainsUL(false)
 
     // has lowercase letter
-    if (password.toUpperCase() != password) {
-      setContainsLL(true)
+    if (password.toUpperCase() !== password) {
+      setContainsLL(true);
       // console.log('An lowerCase letter (A-Z)')
-    
+    } else {
+      console.log("has lowercase letter");
+      setContainsLL(false);
+      tempErrors.push(mustContainData[0]);
+
     }
-    else setContainsLL(false)
 
     // has number
-    if (/\d/.test(password)) setContainsN(true)
-    else setContainsN(false)
-
-    // has special character
-    if (/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(password)) setContainsSC(true)
-    else setContainsSC(false)
+    if (/\d/.test(password)) setContainsN(true);
+    else {
+      console.log("has no number");
+      setContainsN(false);
+      tempErrors.push(mustContainData[2]);
+    
+    }
 
     // has 8 characters
-    if (password.length >= 8) setContains8C(true)
-    else setContains8C(false)
-
-    // passwords match
-    // if (password !== "" && passwordOne === passwordTwo) setPasswordMatch(true)
-    // else setPasswordMatch(false)
+    if (password.length >= 8) setContains8C(true);
+    else {
+      console.log("has no 8 characters");
+      setContains8C(false);
+      tempErrors.push(mustContainData[4]);
+     
+    }
 
     // all validations passed
-    if (containsUL && containsLL && containsN && containsSC && contains8C ) setAllValid(true)
-    else setAllValid(false)
-  }
+    console.log("Valid hogaya", containsLL, containsUL, containsN, contains8C);
+    if (!isValid) {
+      setErrorArray(tempErrors);
+      // setAllValid(true);
+    }
+    else{
+      handleOpen()
+      setTimeout(() => {
+        history.push("/Confirmation");
+      }, 2000);
+      console.log('hello')
+    }
+  };
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   return (
     <div>
       <div className={classes.root}>
-        <Grid container className={classes.root}>
-          <Grid item lg={8} md={8} sm={10} xs={10}>
-            <br />
-            <br />
+        <Grid container justify="center" alignItems="center" className={classes.root} >
+          <Grid item lg={8} md={10} sm={10} xs={10}>
             <div className={classes.card}>
               <h1 className={classes.title}></h1>
               <div>
@@ -219,13 +285,19 @@ export const Signup = () => {
                       error={validate.firstNameError ? true : false}
                       errorText={validate.firstNameError}
                       value={firstName}
-                      onChange={(e) => setFirstName(e.target.value
-                        .toLowerCase()
-                        .split(" ")
-                        .map(word => {
-                          return word.charAt(0).toUpperCase() + word.slice(1);
-                        })
-                        .join(" "))}
+                      onChange={(e) =>
+                        setFirstName(
+                          e.target.value
+                            .toLowerCase()
+                            .split(" ")
+                            .map((word) => {
+                              return (
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                              );
+                            })
+                            .join(" ")
+                        )
+                      }
                       label="First Name"
                     />
                   </Grid>
@@ -237,14 +309,19 @@ export const Signup = () => {
                       errorText={validate.lastNameError}
                       // placeholder="Last Name"
                       value={lastName}
-                      onChange={(e) => setLastName(
-                        e.target.value
-                          .toLowerCase()
-                          .split(" ")
-                          .map(word => {
-                            return word.charAt(0).toUpperCase() + word.slice(1);
-                          })
-                          .join(" "))}
+                      onChange={(e) =>
+                        setLastName(
+                          e.target.value
+                            .toLowerCase()
+                            .split(" ")
+                            .map((word) => {
+                              return (
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                              );
+                            })
+                            .join(" ")
+                        )
+                      }
                     />
                   </Grid>
                 </Grid>
@@ -280,35 +357,57 @@ export const Signup = () => {
                       error={validate.passwordError ? true : false}
                       errorText={validate.passwordError}
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      // onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => ontypePassword(e)}
                       type="password"
                       label="Password"
-                      onKeyUp={validatePassword}
+                      // onKeyUp={validatePassword}
+                      onBlur={validatePassword}
+                    // onFocus={validatePassword}
                     />
                     {/* <div className="must-container cfb">
                       {mustContainData.map(data => <MustContainItem data={data} />)}
                     </div> */}
                   </Grid>
-                  </Grid>
-                  <Grid container className={classes.flex}>
-                    <Grid item lg={12} sm={12} md={12} xs={12}>
-                    </Grid>
-                  </Grid>
-                  <br />
-                  <br />
-                  <span onClick={handleSignUp}>
-                    <Btn
-                      load={load}
-                      value="Next"
-                      color="#ECECEC"
-                      bgcolor="#00EFD4"
-                    />
-                  </span>
+                </Grid>
+                <Grid container className={classes.flex}>
+                  <Grid item lg={12} sm={12} md={12} xs={12}></Grid>
+                </Grid>
+                <br />
+                <br />
+                <span onClick={handleSignUp}>
+                  <Btn
+                    load={load}
+                    value="Next"
+                    color="#ECECEC"
+                    bgcolor="#00EFD4"
+                  />
+                </span>
               </div>
-              </div>
+            </div>
+            <Modal
+              aria-labelledby="transition-modal-title"
+              aria-describedby="transition-modal-description"
+              className={classes.modal}
+              open={open}
+              // onClose={handleClose}
+              closeAfterTransition
+              BackdropComponent={Backdrop}
+              BackdropProps={{
+                timeout: 500,
+              }}
+            >
+              <Fade in={open}>
+                <div className={classes.paper}>
+                  <CircularProgress style={{
+                    color:"#00EFD4"
+                  }} />
+                </div>
+              </Fade>
+            </Modal>
           </Grid>
-          </Grid>
+        </Grid>
       </div>
-      </div>
-      );
+    </div>
+  );
 };

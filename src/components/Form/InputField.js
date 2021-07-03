@@ -110,6 +110,8 @@ export const InputField = (props) => {
           multiline={props.multiline}
           rows={props.rows}
           disabled={props.disabled}
+          onFocus={props.onFocus}
+          onBlur={props.onBlur}
         // onChange={(e) => props?.onChange(e)}
         // id={props.id}
         />

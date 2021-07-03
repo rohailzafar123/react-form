@@ -1419,6 +1419,13 @@
     react-is "^16.8.0 || ^17.0.0"
     react-transition-group "^4.4.0"
 
+"@material-ui/icons@^4.11.2":
+  version "4.11.2"
+  resolved "https://registry.yarnpkg.com/@material-ui/icons/-/icons-4.11.2.tgz#b3a7353266519cd743b6461ae9fdfcb1b25eb4c5"
+  integrity sha512-fQNsKX2TxBmqIGJCSi3tGTO/gZ+eJgWmMJkgDiOfyNaunNaxcklJQFaFogYcFl0qFuaEz1qaXYXboa/bUXVSOQ==
+  dependencies:
+    "@babel/runtime" "^7.4.4"
+
 "@material-ui/styles@^4.11.4":
   version "4.11.4"
   resolved "https://registry.yarnpkg.com/@material-ui/styles/-/styles-4.11.4.tgz#eb9dfccfcc2d208243d986457dff025497afa00d"
@@ -8084,6 +8091,11 @@ pascalcase@^0.1.1:
   resolved "https://registry.yarnpkg.com/pascalcase/-/pascalcase-0.1.1.tgz#b363e55e8006ca6fe21784d2db22bd15d7917f14"
   integrity sha1-s2PlXoAGym/iF4TS2yK9FdeRfxQ=
 
+password-validator@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/password-validator/-/password-validator-5.1.1.tgz#f1dd03a862fa73abf6cbff437acb516aaa784684"
+  integrity sha512-PsnXRlCHzZGviGro9iJXo76vj7Y7Txd0OyJhLsF4pCpsDn53iIuhX5h0mYr93KqkNrc7Htk4jocaYFGVjG/Ohw==
+
 path-browserify@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/path-browserify/-/path-browserify-0.0.1.tgz#e6c4ddd7ed3aa27c68a20cc4e50e1a4ee83bbc4a"
@@ -9355,6 +9367,13 @@ react-transition-group@^4.4.0:
     dom-helpers "^5.0.1"
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
+
+react-use-password-validator@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/react-use-password-validator/-/react-use-password-validator-0.0.1.tgz#7b0d7f71545c11a47cf74510e8be51a6a2ee9057"
+  integrity sha512-dayWv8sj7hSVCuWiZv3pIIUrKcstWGoN5daFnRtJxNEedjZ9c4g+o1BSEoZpbUc1lMK58aEbYZUmhJ/2xU3GIg==
+  dependencies:
+    password-validator "^5.1.1"
 
 react@^16.8.0:
   version "16.14.0"
